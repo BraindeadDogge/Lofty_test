@@ -2,6 +2,13 @@
 
 <template>
   <div>
+    <select name="difficulty" id="difficulty" v-model="difficulty" @change="setDifficulty">
+      <option :value="1">Easy</option>
+      <option :value="2">Medium</option>
+      <option :value="3">Hard</option>
+      <option :value="4">Super Hard(don't try)</option>
+    </select>
+
     <div class="game-board">
       <div v-for="(row, y) in gameBoard" :key="y" class="row">
         <div v-for="(cell, x) in row" :key="x" class="cell"
@@ -20,6 +27,14 @@ import { mapState, mapMutations } from 'vuex';
 export default {
   computed: {
     ...mapState(['gameBoard', 'snake', 'apple', 'score']),
+    difficulty: {
+      get() {
+        return this.$store.state.difficulty;
+      },
+      set(value) {
+        this.$store.commit('setDifficulty', value);
+      },
+    },
   },
   methods: {
     ...mapMutations(['moveSnake', 'changeDirection']),
@@ -34,11 +49,19 @@ export default {
         this.changeDirection(e.key.toUpperCase());
       }
     },
+    stopGame() {
+      this.$store.commit('stopGame');
+      clearInterval(this.$store.state.gameInterval);
+    },
+    setDifficulty(event) {
+      this.difficulty = event.target.value;
+      event.target.blur();
+    },
   },
   mounted() {
     this.gameInterval = setInterval(() => {
-      this.moveSnake();
-    }, 200);
+      this.$store.dispatch('updateGame');
+    }, this.$store.state.moveInterval);
 
     window.addEventListener('keydown', this.handleKeydown);
   },
@@ -53,6 +76,7 @@ export default {
 .game-board {
   display: flex;
   flex-direction: column;
+  margin-top: 20px;
 }
 
 .row {

@@ -13,6 +13,9 @@ const store = () =>
       apple: { x: 0, y: 0 },
       score: 0,
       hasMoved: false,
+      moveInterval: 200,
+      gameInterval: null,
+      difficulty: 2,
     },
     mutations: {
       moveSnake(state) {
@@ -45,6 +48,7 @@ const store = () =>
           state.score = 0;
           state.snake = [{ x: 10, y: 10 }];
           state.direction = "ARROWUP";
+          state.moveInterval = 200;
           return;
         }
 
@@ -55,11 +59,24 @@ const store = () =>
             y: Math.floor(Math.random() * 20),
           };
           state.score++;
+
+          // decrease moveInterval by milliseconds after apple eaten, down to exact ms for different difficulty levels
+          if (state.difficulty == 1) {
+            state.moveInterval = Math.max(state.moveInterval * 0.98, 100);
+          } else if (state.difficulty == 2) {
+            state.moveInterval = Math.max(state.moveInterval * 0.9, 80);
+          } else if (state.difficulty == 3) {
+            state.moveInterval = Math.max(state.moveInterval * 0.7, 50);
+          } else {
+            state.moveInterval = Math.max(state.moveInterval * 0.4, 20);
+          }
+          console.log(state.moveInterval);
         } else {
           state.snake.pop(); // remove tail if no apple was eaten
         }
 
         state.snake.unshift(head);
+
         // reset the flag
         state.hasMoved = false;
       },
@@ -75,7 +92,11 @@ const store = () =>
         };
 
         // prevent the snake from reversing its direction if it has more than one segment
-        if ((state.snake.length > 1 && opposites[newDirection] === state.direction) || state.hasMoved) {
+        if (
+          (state.snake.length > 1 &&
+            opposites[newDirection] === state.direction) ||
+          state.hasMoved
+        ) {
           return;
         }
 
@@ -91,6 +112,20 @@ const store = () =>
 
       stopGame(state) {
         state.gameInProgress = false;
+      },
+
+      setDifficulty(state, difficulty) {
+        state.difficulty = difficulty;
+      },
+    },
+    actions: {
+      updateGame({ commit, state }) {
+        commit("moveSnake");
+        clearInterval(state.gameInterval);
+        state.gameInterval = setInterval(
+          () => commit("moveSnake"),
+          state.moveInterval
+        );
       },
     },
   });
