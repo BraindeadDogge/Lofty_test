@@ -8,7 +8,7 @@ const store = () =>
     state: {
       gameBoard: Array(20).fill(Array(20).fill(null)),
       snake: [{ x: 10, y: 10 }],
-      direction: "ARROWUP",
+      direction: "",
       gameInProgress: false,
       apple: { x: 0, y: 0 },
       score: 0,
