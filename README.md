@@ -19,3 +19,7 @@ $ yarn dev
 ### `Second and third task`
 
 Вторая и третья задачи выполнены в папке plugins, файлы task2.js и task3.js соответственно.
+
+### `Snake game`
+
+Игра в змейку написана в /pages/game.vue и /plugins/index.js. Сама игра доступна на локальном сервере в ссылке http://localhost:3000/game
